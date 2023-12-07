@@ -8,21 +8,27 @@ public class Client extends Account {
     private double reaProfit;
     private StockInventory ownedStock;
     private ArrayList<Double> shareStock;
+    private ArrayList<String> receivedNotification;
     private Scanner sc;
 
     //Constructor
-    public Client(){
+    public Client() {}
+    public Client(String username, String password, String email){
         this.balance = 0;
         this.unreaProfit = 0;
         this.reaProfit = 0;
         this.ownedStock = new StockInventory();
         this.shareStock = new ArrayList<Double>();
+        this.receivedNotification = new ArrayList<String>();
+        this.name = username;
+        this.password = password;
+        this.email = email;
     }
 
     //Function
     public void Run(){
-        new LogIn().Run();
-        Market market = new Market();
+        
+        //Market market = new Market();
         while(true){
             sc = new Scanner(System.in);
             System.out.println("Please decide your action by pressing a number from 1 to 5 ");
@@ -40,8 +46,12 @@ public class Client extends Account {
                 System.out.println("The remaining balance you have now is: " + this.balance);
             }
             else if(action==2) {    //Sell
+                print();
                 System.out.println("Please input the index of the stock you would like to buy");
+                int index = sc.nextInt();
                 System.out.println("Please input how many quantity you would like to place the order");
+                double quantity = sc.nextDouble();
+                Sell(index, quantity);
             }
             else if(action==3) {    //Deposit
                 System.out.println("Please input the amount of money you would like to deposit");
@@ -60,24 +70,27 @@ public class Client extends Account {
                 CheckReaProfit();
             }
             else if(action==7) {    //Display client's owned stock
-                this.ownedStock.displayStock();
+                print();
             }
         }
     }
 
     public void Buy(Stock stock, double quantity){
+        stock.setShare(quantity);
         this.ownedStock.getStockList().add(stock);                                  //add stock into owned stocks
-        this.shareStock.add(quantity);
         this.balance -= stock.getPrice() * quantity;                                //deduct money bc of purchase
     }
 
     public void Sell(int stockIdx, double quantity){
-        if(this.shareStock.get(stockIdx) > quantity){                               //if there are remaining shares after selling
-            this.shareStock.set(stockIdx, this.shareStock.get(stockIdx)-quantity);  //set the corresponding share to the new value
+        Stock stockToSell = this.ownedStock.getStockList().get(stockIdx);
+        double ownedShare = stockToSell.getShare();
+        if(ownedShare > quantity){                                                  //if there are remaining shares after selling
+            stockToSell.setShare(ownedShare-quantity); //set the corresponding share to the new value
+            this.balance += stockToSell.getPrice() * quantity;
         }
         else{                                                                       //client sells all of the shares he has
             this.ownedStock.getStockList().remove(stockIdx);                        //remove specified stock in owned stocks
-            this.shareStock.remove(stockIdx);
+            this.balance += stockToSell.getPrice() * ownedShare;
         }
     }
 
@@ -101,5 +114,21 @@ public class Client extends Account {
 
     public void CheckReaProfit(){
         System.out.println("Your realized profit is: " + this.reaProfit);
+    }
+
+    public void addNotification(String msg){
+        this.receivedNotification.add(msg);
+    }
+
+    public void print(){
+        System.out.println("Name: " + name);
+        System.out.println("Balance: " + balance + " | Unrealized Profit: " + unreaProfit + " | Realized Profit: " + reaProfit);
+        ownedStock.displayStock();
+        System.out.println("Below is the received notifications: ");
+        for(int i=0; i<receivedNotification.size(); i++){
+            System.out.println("[ " + i + " ] : " + receivedNotification.get(i));
+        }
+        System.out.println("-----------------------");
+        System.out.println();
     }
 }
