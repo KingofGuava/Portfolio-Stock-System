@@ -1,17 +1,16 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Manager extends Account {
     //Attributes
     private Scanner sc;
-    private ArrayList<Client> clientPool;
+
     //Constructor
     public Manager(){}
 
     //Functions
     public void Run(){
-        new LogIn().Run();
-        Market market = new Market();
+        //new LogRegPage().run();
+        //Market market = new Market();
         while(true){
             sc = new Scanner(System.in);
             System.out.println("Please decide your action by pressing a number from 1 to 5 ");
@@ -22,7 +21,7 @@ public class Manager extends Account {
                 String symbol = sc.next();
                 System.out.println("Please intput the price of the stock you want to add.");
                 double price = sc.nextDouble();
-                Stock stockToAdd = new Stock(symbol, price);
+                Stock stockToAdd = new Stock(symbol, price, 10000, price);
                 market.addStock(stockToAdd);
                 System.out.println("Below is the list of stocks in the market after change: ");
                 market.printMarket();
@@ -46,13 +45,31 @@ public class Manager extends Account {
                 market.printMarket();
             }
             else if(action==4) {    //Track Client Profits
-                
+                clientDB.print();
             }
             else if(action==5) {    //Notify Client
-                
+                clientDB.printNameOnly();
+                System.out.println("Please input the index of the Client you want to notify.");
+                int index = sc.nextInt();
+                System.out.println("Please input the message you want to notify the client.");
+                String msg = sc.next();
+                clientDB.getDB().get(index).addNotification(msg);
+                clientDB.getDB().get(index).print();
             }
-            else if(action==6) {    //Approve New Client
-                
+            else if(action==6) {    //Approve the request
+                requestDB.print();
+                System.out.println("Which registeration request you would like to approve?");
+                int index = sc.nextInt();
+                clientDB.addNewClient(requestDB.getRequest(index));
+                requestDB.removeRequest(index);
+                requestDB.print();
+            }
+            else if(action==7) {    //Reject the request
+                requestDB.print();
+                System.out.println("Which registeration request you would like to reject?");
+                int index = sc.nextInt();
+                requestDB.removeRequest(index);
+                requestDB.print();
             }
         }
     }

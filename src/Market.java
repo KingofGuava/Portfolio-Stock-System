@@ -2,31 +2,26 @@ import java.util.ArrayList;
 
 public class Market {
     //Attributes
-    private ArrayList<Stock> stockMarket;
+    private static ArrayList<Stock> stockMarket = new ArrayList<Stock>();
 
-    //Constructor
-    public Market(){
-        this.stockMarket = new ArrayList<Stock>();
-        setMarket();
+    static {
+        stockMarket.add(new Stock("TSLA", 235.58, 10000, 235.58));
+        stockMarket.add(new Stock("UBER", 58.63, 10000, 58.63));
+        stockMarket.add(new Stock("NVDA", 445.10, 10000, 445.10));
+        stockMarket.add(new Stock("PFE", 29.28, 10000, 29.28));
+        stockMarket.add(new Stock("AMZN", 144.88, 10000, 144.88));
+        stockMarket.add(new Stock("APPL", 189.43, 10000, 189.43));
+        stockMarket.add(new Stock("AMD", 118.57, 10000, 118.57));
+        stockMarket.add(new Stock("RIOT", 15.00, 10000, 15.00));
     }
+
+    
 
     //Access Func
     public ArrayList<Stock> getMarket(){
-        return this.stockMarket;
+        return stockMarket;
     }
-
-    //Mutate Func
-    public void setMarket(){
-        this.stockMarket.add(new Stock("TSLA", 235.58));
-        this.stockMarket.add(new Stock("UBER", 58.63));
-        this.stockMarket.add(new Stock("NVDA", 445.10));
-        this.stockMarket.add(new Stock("PFE", 29.28));
-        this.stockMarket.add(new Stock("AMZN", 144.88));
-        this.stockMarket.add(new Stock("APPL", 189.43));
-        this.stockMarket.add(new Stock("AMD", 118.57));
-        this.stockMarket.add(new Stock("RIOT", 15.00));
-    }
-
+    
     //Func
     public void printMarket(){
         for(int i=0; i<stockMarket.size(); i++){
@@ -36,17 +31,17 @@ public class Market {
 
     //Add a stock to the market
     public void addStock(Stock stock) {
-        this.stockMarket.add(stock);
+        stockMarket.add(stock);
     }
 
     //Remove a stock from the market
     public void removeStock(int index) {
-        this.stockMarket.remove(index);
+        stockMarket.remove(index);
     }
 
     //Modify price of a stock
     public void modifyStockPrice(int index, double price) {
-        this.stockMarket.get(index).setPrice(price);
+        stockMarket.get(index).setPrice(price);
     }
 
 }

@@ -10,7 +10,7 @@ public class App {
             new Manager().Run();
         }
         else if(loginDecision==2) {
-            new Client().Run();
+            new LogRegPage().run();
         }
     }
 }
