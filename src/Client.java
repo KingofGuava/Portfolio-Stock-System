@@ -29,6 +29,16 @@ public class Client extends Account {
         this.password = password;
         this.email = email;
     }
+    public Client(String username, String password, String email,double balance,double unreaProfit,double reaProfit){
+        this.balance = balance;
+        this.unreaProfit = unreaProfit; //flex
+        this.reaProfit = reaProfit;
+        this.ownedStock = new StockInventory();
+        this.shareStock = new ArrayList<Double>();
+        this.username = username; //
+        this.password = password;
+        this.email = email;
+    }
     public void fetchclient(){
         Connection c = null;
         try {
@@ -40,10 +50,10 @@ public class Client extends Account {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                String username = rs.getString("username");
-                String accountBalance = rs.getString("accountBalance");
-                Double realizedprofits = rs.getDouble("realizedprofits");
-                String unrealizedprofits = rs.getString("unrealizedprofits");
+                this.username = rs.getString("username");
+                this.balance = rs.getDouble("accountBalance");
+                this.reaProfit = rs.getDouble("realizedprofits");
+                this.unreaProfit = rs.getDouble("unrealizedprofits");
 //                System.out.println("my username is： " + username);
 //                System.out.println("my password is： " + password);
 //                System.out.println("my email is： " + email);

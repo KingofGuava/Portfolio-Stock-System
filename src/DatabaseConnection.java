@@ -11,7 +11,7 @@ public class DatabaseConnection {
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
         if (connection == null || connection.isClosed()) {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:src\\backend\\user.sqlite");
+            connection = DriverManager.getConnection("jdbc:sqlite:src\\user.sqlite");
             connection.setAutoCommit(false);
             System.out.println("Opened database successfully");
         }
