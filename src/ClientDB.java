@@ -142,7 +142,7 @@ public class ClientDB {
         }
         System.out.println("Login successfully");
         return new Client();
-        //hi
+        //
     }
 
     public ArrayList<Client> getDB(){
