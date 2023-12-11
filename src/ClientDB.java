@@ -115,21 +115,29 @@ public class ClientDB {
         try {
             c = DatabaseConnection.getConnection();
 
-            String sql = "SELECT * FROM Users WHERE role=? AND username=? AND password=?";
+            String sql = "SELECT u.username, u.password, u.email, c.accountBalance, c.realizedprofits, c.unrealizedprofits " +
+                    "FROM users u JOIN client c ON u.username = c.username " +
+                    "WHERE u.role = ? AND u.username = ? AND u.password = ?";
+
             PreparedStatement pstmt = c.prepareStatement(sql);
             pstmt.setString(1, "client");
             pstmt.setString(2, username);
             pstmt.setString(3, password);
 
             ResultSet rs = pstmt.executeQuery();
-                while (rs.next()) {
-                    String username1 = rs.getString("username");
-                    String password1 = rs.getString("password");
-                    String email1 = rs.getString("email");
-                    String role1 = rs.getString("role");
-                    Client client=new Client(username1,password1,email1);
-                }
-                rs.close();
+            while (rs.next()) {
+                String username1 = rs.getString("username");
+                String password1 = rs.getString("password");
+                String email1 = rs.getString("email");
+                double accountBalance = rs.getDouble("accountBalance");
+                double realizedProfits = rs.getDouble("realizedprofits");
+                double unrealizedProfits = rs.getDouble("unrealizedprofits");
+
+                Client client = new Client(username1, password1, email1, accountBalance, realizedProfits, unrealizedProfits);
+                return client;
+            }
+            rs.close();
+
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             System.exit(0);
@@ -138,7 +146,7 @@ public class ClientDB {
                 DatabaseConnection.closeConnection();
             } catch (SQLException e) {
                 e.printStackTrace();
-            }
+            }//k
         }
         System.out.println("Login successfully");
         return new Client();
