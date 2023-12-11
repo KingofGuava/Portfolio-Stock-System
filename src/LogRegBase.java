@@ -1,7 +1,9 @@
 public abstract class LogRegBase {
-    private String usernameEntry;
-    private String passwordEntry;
+    protected String usernameEntry;  //////
+    protected String passwordEntry;/////////
     private ClientDB clientDB;
+    protected LogRegBase() {
+    }
     
     protected LogRegBase(String username, String password) {
         this.clientDB = new ClientDB();//both forms are going to need access to the same database

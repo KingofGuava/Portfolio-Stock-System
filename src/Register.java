@@ -2,8 +2,9 @@ public class Register extends LogRegBase {
     private String email;
     private RequestDB requestDB;
     
-    public Register(String username, String email, String password) {
-        super(username, password);
+    public Register(String username, String password, String email) {//////
+        this.usernameEntry = username;
+        this.passwordEntry = password;
         this.email = email;
         this.requestDB = new RequestDB();
     }

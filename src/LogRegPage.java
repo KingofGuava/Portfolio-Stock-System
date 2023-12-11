@@ -25,7 +25,7 @@ public class LogRegPage {
                 password = input.nextLine();
                 System.out.println("Enter email:\n");
                 email = input.nextLine();
-                Register register = new Register(name, email, password);
+                Register register = new Register(name, password, email);
                 register.runLogReg();
             }
             System.out.println("Do you wish to shutdown the system, (y)es or (n)o?");

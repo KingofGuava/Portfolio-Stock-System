@@ -1,6 +1,12 @@
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 public class Client extends Account {
     //Attributes
     private double balance;
@@ -8,26 +14,59 @@ public class Client extends Account {
     private double reaProfit;
     private StockInventory ownedStock;
     private ArrayList<Double> shareStock;
-    private ArrayList<String> receivedNotification;
+
     private Scanner sc;
 
     //Constructor
     public Client() {}
     public Client(String username, String password, String email){
         this.balance = 0;
-        this.unreaProfit = 0;
+        this.unreaProfit = 0; //flex
         this.reaProfit = 0;
         this.ownedStock = new StockInventory();
         this.shareStock = new ArrayList<Double>();
-        this.receivedNotification = new ArrayList<String>();
-        this.name = username;
+        this.username = username; //
         this.password = password;
         this.email = email;
+    }
+    public void fetchclient(){
+        Connection c = null;
+        try {
+            c = DatabaseConnection.getConnection();
+
+            String sql = "SELECT * FROM Client WHERE username=?";
+            PreparedStatement pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, this.username);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String username = rs.getString("username");
+                String accountBalance = rs.getString("accountBalance");
+                Double realizedprofits = rs.getDouble("realizedprofits");
+                String unrealizedprofits = rs.getString("unrealizedprofits");
+//                System.out.println("my username is： " + username);
+//                System.out.println("my password is： " + password);
+//                System.out.println("my email is： " + email);
+//                System.out.println("my role is： " + role);
+
+            }
+            rs.close();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        } finally {
+            try {
+                DatabaseConnection.closeConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Query done successfully");
     }
 
     //Function
     public void Run(){
-        
+        this.fetchclient();
         //Market market = new Market();
         while(true){
             sc = new Scanner(System.in);
@@ -121,7 +160,7 @@ public class Client extends Account {
     }
 
     public void print(){
-        System.out.println("Name: " + name);
+        System.out.println("UserName: " + username);
         System.out.println("Balance: " + balance + " | Unrealized Profit: " + unreaProfit + " | Realized Profit: " + reaProfit);
         ownedStock.displayStock();
         System.out.println("Below is the received notifications: ");
