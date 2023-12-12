@@ -88,34 +88,16 @@ public class Client extends Account implements StockObserver {
             System.out.println("Please decide your action by pressing a number from 1 to 5 ");
             int action = sc.nextInt();
             if(action==1) {         //Client.Buy
-                market.printMarket();
-                System.out.println("The balance you have now is: " + this.balance);
-                System.out.println("Please input the index of the stock you would like to buy");
-                int stockIdx = sc.nextInt();
-                System.out.println("Please input how many quantity you would like to place the order");
-                double quantity = sc.nextDouble();
-                Stock targetStock = market.getMarket().get(stockIdx);
-                Buy(targetStock, quantity);  //buy the selected stock with specified quantity
-                System.out.println("You've bought the stock " + targetStock.getSymbol() + " for a quantity of " + quantity);
-                System.out.println("The remaining balance you have now is: " + this.balance);
+
             }
             else if(action==2) {    //Client.Sell
-                print();
-                System.out.println("Please input the index of the stock you would like to buy");
-                int index = sc.nextInt();
-                System.out.println("Please input how many quantity you would like to place the order");
-                double quantity = sc.nextDouble();
-                Sell(index, quantity);
+
             }
             else if(action==3) {    //Client.Deposit
-                System.out.println("Please input the amount of money you would like to deposit");
-                double money = sc.nextDouble();
-                Deposit(money);
+
             }
             else if(action==4) {    //Client.Withdraw
-                System.out.println("Please input the amount of money you would like to withdraw");
-                double money = sc.nextDouble();
-                Withdraw(money);
+
             }
             else if(action==5) {    //Check unrealized profit
                 CheckUnreaProfit();
@@ -123,44 +105,14 @@ public class Client extends Account implements StockObserver {
             else if(action==6) {    //Check realized profit
                 CheckReaProfit();
             }
-            else if(action==7) {    //Display client's owned stock
-                print();
-            }
+
         }
     }
 
-    public void Buy(Stock stock, double quantity){
-        stock.setShare(quantity);
-        this.ownedStock.getStockList().add(stock);                                  //add stock into owned stocks
-        this.balance -= stock.getPrice() * quantity;                                //deduct money bc of purchase
-    }
 
-    public void Sell(int stockIdx, double quantity){
-        Stock stockToSell = this.ownedStock.getStockList().get(stockIdx);
-        double ownedShare = stockToSell.getShare();
-        if(ownedShare > quantity){                                                  //if there are remaining shares after selling
-            stockToSell.setShare(ownedShare-quantity); //set the corresponding share to the new value
-            this.balance += stockToSell.getPrice() * quantity;
-        }
-        else{                                                                       //client sells all of the shares he has
-            this.ownedStock.getStockList().remove(stockIdx);                        //remove specified stock in owned stocks
-            this.balance += stockToSell.getPrice() * ownedShare;
-        }
-    }
 
-    public void Deposit(double amount){
-        System.out.println("Your current balance is: " + this.balance);
-        System.out.println("How much money do you want to deposit?");
-        this.balance += amount;                         //add money to wallet
-        System.out.println("Your balance after deposit is: " + this.balance);
-    }
 
-    public void Withdraw(double amount){
-        System.out.println("Your current balance is: " + this.balance);
-        System.out.println("How much money do you want to withdraw?");
-        this.balance -= amount;                         //deduct money from wallet
-        System.out.println("Your balance after withdraw is: " + this.balance);
-    }
+
 
     public void CheckUnreaProfit(){
         System.out.println("Your unrealized profit is: " + this.unreaProfit);
