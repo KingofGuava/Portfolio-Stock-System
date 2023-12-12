@@ -16,9 +16,9 @@ public class LogRegPage implements LogRegIface{
             regOrLogInput = input.nextLine();
             
             if(regOrLogInput.equalsIgnoreCase("l")) {
-                runLogIn();
+                //runLogIn();
             }else if(regOrLogInput.equalsIgnoreCase("r")) {
-                runRegister();
+                //runRegister();
             }
             System.out.println("Do you wish to shutdown the system, (y)es or (n)o?");
             String inputText = input.nextLine();
@@ -28,7 +28,7 @@ public class LogRegPage implements LogRegIface{
         }
     }
 
-    public void runLogIn(){
+    public void runLogIn(String username, String password){
         System.out.println("Enter username:\n");
         username = input.nextLine();
         System.out.println("Enter password:\n");
@@ -37,14 +37,14 @@ public class LogRegPage implements LogRegIface{
         login.runLogReg();
     }
 
-    public void runRegister(){
+    public void runRegister(String name, String password, String fullname, String phone, String address, String email){
         System.out.println("Enter name:\n");
         name = input.nextLine();
         System.out.println("Enter password:\n");
         password = input.nextLine();
         System.out.println("Enter email:\n");
         email = input.nextLine();
-        Register register = new Register(name, password, email);
+        Register register = new Register(name, password, fullname, phone, address, email);
         register.runLogReg();
     }
 }
