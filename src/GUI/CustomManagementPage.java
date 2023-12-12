@@ -4,10 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class CustomManagementPage extends JFrame {
     private JPanel menuPanel;
@@ -21,10 +18,11 @@ public class CustomManagementPage extends JFrame {
     private JTextField currentFundsTextField;
     private JTextField withdrawAmountTextField;
     private JTextField depositAmountTextField;
-
     private double funds;
     private JButton withdrawButton;
     private JButton depositButton;
+
+    private DefaultTableModel historyTableModel;
     public CustomManagementPage() {
         setTitle("Personal stock management system");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,6 +37,7 @@ public class CustomManagementPage extends JFrame {
         add(contentPanel, BorderLayout.CENTER);
 
         setVisible(true);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     private void createMenuPanel() {
@@ -46,8 +45,9 @@ public class CustomManagementPage extends JFrame {
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         menuPanel.setBackground(new Color(44, 62, 80)); // Set background color
 
-        JButton stockButton = createMenuButton("Manage Stocks");
+        JButton stockButton = createMenuButton("Manage Stocks ");
         JButton customerButton = createMenuButton("      Account      ");
+        JButton messageButton = createMenuButton("      Message     ");
 
         menuPanel.add(createMenuTitle("Customer")); // Title for the menu
         menuPanel.add(Box.createVerticalStrut(20)); // Spacing
@@ -55,6 +55,8 @@ public class CustomManagementPage extends JFrame {
         menuPanel.add(stockButton);
         menuPanel.add(Box.createVerticalStrut(10)); // Spacing
         menuPanel.add(customerButton);
+        menuPanel.add(Box.createVerticalStrut(10)); // Spacing
+        menuPanel.add(messageButton);
 
         // Add flexible space to fill the remaining height
         menuPanel.add(Box.createVerticalGlue());
@@ -72,7 +74,61 @@ public class CustomManagementPage extends JFrame {
                 showCustomerPanel();
             }
         });
+
+        messageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showMessagePanel();
+            }
+        });
     }
+
+    private void showMessagePanel() {
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        contentPanel.removeAll();
+
+        // Title Label
+        JLabel titleLabel = new JLabel("Received Message");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        // Large JTextfield
+        JTextArea messageTextArea = new JTextArea("You have obtained the qualification to trade options");
+        messageTextArea.setFont(new Font("Arial", Font.PLAIN, 18));
+        messageTextArea.setLineWrap(true);
+        messageTextArea.setWrapStyleWord(true);
+        messageTextArea.setEditable(false); // Set to non-editable
+
+        // ScrollPane for JTextfield
+        JScrollPane scrollPane = new JScrollPane(messageTextArea);
+        scrollPane.setPreferredSize(new Dimension(400, 200));
+
+        // OK Button
+        JButton okButton = new JButton("OK");
+        okButton.setFont(new Font("Arial", Font.PLAIN, 18));
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                messageTextArea.setText("There is currently no other message available");
+            }
+        });
+
+        // Set layout for the content panel
+        contentPanel.setLayout(new BorderLayout());
+
+        // Add components to the content panel
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(okButton, BorderLayout.SOUTH);
+
+        // Add padding and set border
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        contentPanel.revalidate();
+        contentPanel.repaint();
+    }
+
 
     private JButton createMenuButton(String text) {
         JButton button = new JButton(text);
@@ -105,114 +161,138 @@ public class CustomManagementPage extends JFrame {
         contentPanel.add(defaultLabel, BorderLayout.CENTER);
     }
 
+    private void addPlaceholder(JTextField textField, String placeholder) {
+        textField.setForeground(Color.GRAY);
+        textField.setText(placeholder);
+
+        textField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (textField.getText().equals(placeholder)) {
+                    textField.setText("");
+                    textField.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (textField.getText().isEmpty()) {
+                    textField.setForeground(Color.GRAY);
+                    textField.setText(placeholder);
+                }
+            }
+        });
+    }
     private void showStockPanel() {
         contentPanel.removeAll();
-        contentPanel.setLayout(new FlowLayout());
+        contentPanel.setLayout(new GridLayout(4, 2, 10, 5)); // Adjust rows to accommodate components
+
         // Sample data for the stock table (replace this with your actual data)
-        String[] columnNames = {"Stock Name", "Stock Price"};
-        String[][] tableValues = {{"Stock 1", "100"},{"Stock 2", "100"},{"Stock 3", "100"}};
-        tableModel = new DefaultTableModel(tableValues, columnNames);
-        JTable table = new JTable(tableModel);
-        table.setFont(new Font("Arial", Font.PLAIN, 16)); // Increase font size for the table
+        String[] stockColumnNames = {"Stock Name", "Stock Price"};
+        String[][] stockTableValues = {{"Stock 1", "100"}, {"Stock 2", "100"}, {"Stock 3", "100"}};
+        DefaultTableModel stockTableModel = new DefaultTableModel(stockTableValues, stockColumnNames);
+        JTable stockTable = new JTable(stockTableModel);
+        stockTable.setFont(new Font("Arial", Font.PLAIN, 16)); // Increase font size for the table
 
-        JScrollPane scrollPane = new JScrollPane(table);
-        table.setRowSorter(new TableRowSorter<>(tableModel));
-        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        JScrollPane stockScrollPane = new JScrollPane(stockTable);
+        stockTable.setRowSorter(new TableRowSorter<>(stockTableModel));
+        contentPanel.add(stockScrollPane);
 
-        table.setRowSorter(new TableRowSorter<>(tableModel));// Set the table sorter
-        // Set the table selection mode to single selection
-        table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        final Object[] oa = {null};
-        final Object[] ob = {null};
-        // Add a mouse event listener to the table
-        table.addMouseListener(new MouseAdapter(){
-            // Handle a mouse click event
-            public void mouseClicked(MouseEvent e){
-                // Get the index of the selected row
-                int selectedRow = table.getSelectedRow();
-                // Get the value of the specified cell from the table model
-                oa[0] = tableModel.getValueAt(selectedRow, 0);
-            }
-        });
-        scrollPane.setViewportView(table);
-        final JPanel panel = new JPanel();
-        contentPanel.add(panel, BorderLayout.SOUTH);
-        panel.add(new JLabel("Purchase amount:"));
-        aTextField = new JTextField("XXX", 10);
-        aTextField.setFont(new Font("Arial", Font.PLAIN, 16)); // Increase font size for text field
-        panel.add(aTextField);
-        final JButton buyButton = new JButton("buy");
-        buyButton.setFont(new Font("Arial", Font.PLAIN, 16)); // Increase font size for button
-        buyButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                if(oa[0]!=null) {
-                    String money = aTextField.getText();
-                    try {
-                        // Attempt to convert the money string to a double
-                        double moneyValue = Double.parseDouble(money);
+        // History transactions table
+        String[] historyColumnNames = {"Transaction Date", "Transaction Type", "Amount"};
+        String[][] historyTableValues = {{"2023-01-01", "Buy", "50"}, {"2023-02-01", "Sell", "30"}};
+        historyTableModel = new DefaultTableModel(historyTableValues, historyColumnNames);
+        JTable historyTable = new JTable(historyTableModel);
+        historyTable.setFont(new Font("Arial", Font.PLAIN, 16));
 
-                        // Check if the value is non-negative
-                        if (moneyValue >= 0) {
-                            // Valid positive double value
-                            JOptionPane.showMessageDialog(CustomManagementPage.this, "You hava buyed " + oa[0].toString() + " " + money + " !");
-                        } else {
-                            // Handle the case when the value is negative
-                            JOptionPane.showMessageDialog(CustomManagementPage.this, "Money amount must be non-negative.");
-                        }
-                    } catch (NumberFormatException ex) {
-                        // Handle the case when the conversion fails
-                        JOptionPane.showMessageDialog(CustomManagementPage.this, "Invalid money amount. Please enter a valid number.");
-                    }
-                }else{
-                    JOptionPane.showMessageDialog(CustomManagementPage.this, "You should choose one socket at first!");
+        JScrollPane historyScrollPane = new JScrollPane(historyTable);
+        contentPanel.add(historyScrollPane);
+
+        // Stock selection listener
+        stockTable.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = stockTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    String stockName = stockTableModel.getValueAt(selectedRow, 0).toString();
+                    System.out.println(stockName);
+                    loadHistoryTransactions(stockName);
                 }
             }
         });
-        panel.add(buyButton);
-        panel.add(new JLabel("Selling amount:"));
-        bTextField = new JTextField("XXX", 10);
-        bTextField.setFont(new Font("Arial", Font.PLAIN, 16)); // Increase font size for text field
-        panel.add(bTextField);
-        // Update data to table
-        // You should set your own rules on how to buy and sell stocks.
-        // When you don't have enough money, you can't buy stocks.
-        // When you don't have enough stocks in hand, you can't sell them
-        //Delete data from table
-        final JButton sellButton = new JButton("sell");
-        sellButton.setFont(new Font("Arial", Font.PLAIN, 16)); // Increase font size for button
-        sellButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-                String money = bTextField.getText();
-                if(oa[0]!=null) {
-                    try {
-                        // Attempt to convert the money string to a double
-                        double moneyValue = Double.parseDouble(money);
 
-                        // Check if the value is non-negative
-                        if (moneyValue >= 0) {
-                            // Valid positive double value
-                            JOptionPane.showMessageDialog(CustomManagementPage.this, "You hava selled " + oa[0].toString() + " " + money + " !");
-                        } else {
-                            // Handle the case when the value is negative
-                            JOptionPane.showMessageDialog(CustomManagementPage.this, "Money amount must be non-negative.");
-                        }
-                    } catch (NumberFormatException ex) {
-                        // Handle the case when the conversion fails
-                        JOptionPane.showMessageDialog(CustomManagementPage.this, "Invalid money amount. Please enter a valid number.");
-                    }
-                }else{
-                    JOptionPane.showMessageDialog(CustomManagementPage.this, "You should choose one socket at first!");
+        // Buttons panel
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new FlowLayout());
+
+        // JTextField components
+        JTextField textFieldBeforeBuy = new JTextField(15); // Adjust the size as needed
+        addPlaceholder(textFieldBeforeBuy, "The amount you buy");
+        buttonsPanel.add(textFieldBeforeBuy);
+        JTextField textFieldBeforeSell = new JTextField(15); // Adjust the size as needed
+        addPlaceholder(textFieldBeforeSell, "The amount you sell");
+
+        // Buy button
+        JButton buyButton = new JButton("Buy");
+        buyButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        buyButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = stockTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    String stockName = stockTableModel.getValueAt(selectedRow, 0).toString();
+                    String amount = textFieldBeforeBuy.getText();
+                    // Implement buy logic using the selected stock information
                 }
             }
         });
-        panel.add(sellButton);
+        buttonsPanel.add(buyButton);
+
+        // JTextField component before Sell
+        buttonsPanel.add(textFieldBeforeSell);
+
+        // Sell button
+        JButton sellButton = new JButton("Sell");
+        sellButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        sellButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = stockTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    String stockName = stockTableModel.getValueAt(selectedRow, 0).toString();
+                    String amount = textFieldBeforeSell.getText();
+                    // Implement sell logic using the selected stock information
+                }
+            }
+        });
+        buttonsPanel.add(sellButton);
+
+        contentPanel.add(buttonsPanel);
 
         contentPanel.revalidate();
         contentPanel.repaint();
     }
 
+
+    // Method to load and display history transactions for a selected stock
+    private void loadHistoryTransactions(String stockName) {
+        // Implement logic to fetch and display history transactions for the selected stock
+        // Update the history table based on the selected stock
+        String[] historyColumnNames = {"Transaction Date", "Transaction Type", "Amount"};
+        String[][] historyTableValues = {{"2023-01-01", "Buy", "5000"}, {"2023-02-02", "Sell", "3000"}};
+
+        historyTableModel.setRowCount(0);
+        for (String[] rowData : historyTableValues) {
+            historyTableModel.addRow(rowData);
+        }
+        JTable historyTable = new JTable(historyTableModel);
+        historyTable.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        JScrollPane historyScrollPane = new JScrollPane(historyTable);
+        contentPanel.add(historyScrollPane);
+    }
+
     private void showCustomerPanel() {
         //Set the Existing funds
+        contentPanel.revalidate();
+        contentPanel.repaint();
         funds = 1000000;
         contentPanel.removeAll();
 

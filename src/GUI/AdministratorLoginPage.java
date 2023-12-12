@@ -22,7 +22,7 @@ public class AdministratorLoginPage extends JFrame {
         Container contentPane = getContentPane();
 
         // Custom icon:
-        URL url = AdministratorLoginPage.class.getClassLoader().getResource("GUI/img/stock.png");
+        URL url = AdministratorLoginPage.class.getClassLoader().getResource("view/img/stock.png");
         Image image = new ImageIcon(url).getImage();
         setIconImage(image);
 
@@ -89,7 +89,7 @@ public class AdministratorLoginPage extends JFrame {
                 // Compare the userName and Password
                 if(username.equals("admin") && password.equals("admin"))
                     //JOptionPane.showMessageDialog(AdministratorLoginPage.this, "Login in!");
-                    new AdminManagementPage();
+                    new GUI.AdminManagementPage();
                 else{
                     JOptionPane.showMessageDialog(AdministratorLoginPage.this, "The username or password is incorrect!");
                     userNameTextField.setText("");
@@ -103,6 +103,7 @@ public class AdministratorLoginPage extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setVisible(true);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     private void styleSubmitButton(JButton button) {

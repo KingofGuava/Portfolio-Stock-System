@@ -142,8 +142,6 @@ public class CustomerLoginRegisterPage extends JFrame implements LogRegIface{
         register.runLogReg();
     }
 
-
-
     public static void main(String[] args) throws AWTException {
         new CustomerLoginRegisterPage();
     }

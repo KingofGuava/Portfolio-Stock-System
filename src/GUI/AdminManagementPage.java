@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.table.DefaultTableModel;
 
 public class AdminManagementPage extends JFrame {
     private JPanel menuPanel;
@@ -32,6 +33,7 @@ public class AdminManagementPage extends JFrame {
         add(contentPanel, BorderLayout.CENTER);
 
         setVisible(true);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 
     private void createMenuPanel() {
@@ -184,16 +186,45 @@ public class AdminManagementPage extends JFrame {
         contentPanel.repaint();
     }
 
+    private void loadHistoryTransactions(String customer) {
+        // Implement logic to fetch and display history transactions for the selected stock
+        // Update the history table based on the selected stock
+        String[] historyColumnNames = {"Transaction Date", "Earn or Loss", "Amount"};
+        String[][] historyTableValues = {{"2023-01-01", "earn", "5000"}, {"2023-02-02", "loss", "3000"}};
+
+        // Create a new table model for history transactions
+        DefaultTableModel historyTableModel = new DefaultTableModel(historyTableValues, historyColumnNames);
+
+        // Create a table and set its font
+        JTable historyTable = new JTable(historyTableModel);
+        historyTable.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        // Create a scroll pane for the table
+        JScrollPane historyScrollPane = new JScrollPane(historyTable);
+
+        // Show the history transactions in a dialog
+        JOptionPane.showMessageDialog(this, historyScrollPane, "History Transactions for " + customer, JOptionPane.PLAIN_MESSAGE);
+    }
+
     private void showCustomerPanel() {
         contentPanel.removeAll();
 
         // Sample data for the stock table (replace this with your actual data)
         String[] columnNames = {"customer Name", "unrealized profits", "realized profits"};
         String[][] tableValues = {{"customer 1", "100", "200"},{"customer 2", "100", "300"},{"customer 3", "100", "400"}};
-        tableModel2 = new DefaultTableModel(tableValues, columnNames);
+        tableModel2 = new NonEditableTableModel(tableValues, columnNames);
         JTable table = new JTable(tableModel2);
         table.setFont(new Font("Arial", Font.PLAIN, 16)); // Increase font size for the table
-
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    String customer = tableModel2.getValueAt(selectedRow, 0).toString();
+                    System.out.println(customer);
+                    loadHistoryTransactions(customer);
+                }
+            }
+        });
         JScrollPane scrollPane = new JScrollPane(table);
         table.setRowSorter(new TableRowSorter<>(tableModel2));
         contentPanel.add(scrollPane, BorderLayout.CENTER);
@@ -287,5 +318,16 @@ public class AdminManagementPage extends JFrame {
         SwingUtilities.invokeLater(() -> new AdminManagementPage());
     }
 
+    class NonEditableTableModel extends DefaultTableModel {
 
+        public NonEditableTableModel(Object[][] data, Object[] columnNames) {
+            super(data, columnNames);
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            // 返回 false 表示表格不可编辑
+            return false;
+        }
+    }
 }
