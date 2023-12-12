@@ -65,26 +65,36 @@ public class ClientDB {
             try {
                 c = DatabaseConnection.getConnection();
 
-                String sql = "SELECT * FROM Users WHERE role=?";
+                String sql = "SELECT * FROM Users WHERE role=? AND username=? AND password=?";
                 PreparedStatement pstmt = c.prepareStatement(sql);
                 pstmt.setString(1, "client");
-                ResultSet rs = pstmt.executeQuery();
+                pstmt.setString(2, username);
+                pstmt.setString(3, password);
 
-                while (rs.next()) {
-                    String username1 = rs.getString("username");
-                    String password1 = rs.getString("password");
-                    String email1 = rs.getString("email");
-                    String role1 = rs.getString("role");
-                    System.out.println("my username is： " + username1);
-                    System.out.println("my password is： " + password1);
-                    System.out.println("my email is： " + email1);
-                    System.out.println("my role is： " + role1);
-                    if (username1.equalsIgnoreCase(username)
-                            &&  password1.equalsIgnoreCase(password)) {
-                        return true;
-                    }
+                ResultSet rs = pstmt.executeQuery();
+                if(rs.next()){
+                    rs.close();
+                    return true;
                 }
-                rs.close();
+                else {
+                    rs.close();
+                    return false;
+                }
+//                while (rs.next()) {
+//                    String username1 = rs.getString("username");
+//                    String password1 = rs.getString("password");
+//                    String email1 = rs.getString("email");
+//                    String role1 = rs.getString("role");
+//                    System.out.println("my username is： " + username1);
+//                    System.out.println("my password is： " + password1);
+//                    System.out.println("my email is： " + email1);
+//                    System.out.println("my role is： " + role1);
+//                    if (username1.equalsIgnoreCase(username)
+//                            &&  password1.equalsIgnoreCase(password)) {
+//                        return true;
+//                    }
+//                }
+//                rs.close();
             } catch (Exception e) {
                 System.err.println(e.getClass().getName() + ": " + e.getMessage());
                 System.exit(0);
@@ -96,25 +106,51 @@ public class ClientDB {
                 }
             }
             System.out.println("Login successfully");
-
-//        for(Client registeredClient : clientDB) {
-//            if (registeredClient.getUserName().equalsIgnoreCase(username)
-//            &&  registeredClient.getPassword().equalsIgnoreCase(password)) {
-//                return true;
-//            }
-//        }
         return false;
     }
 
     //Same thing as the above function. The only difference is this returns the client
     public static Client getClient(String username, String password) {
-        for(Client registeredClient : clientDB) {
-            if (registeredClient.getUserName().equalsIgnoreCase(username)
-            &&  registeredClient.getPassword().equalsIgnoreCase(password)) {
-                return registeredClient;
+        Connection c = null;
+        try {
+            c = DatabaseConnection.getConnection();
+
+            String sql = "SELECT u.username, u.password, u.email, c.accountBalance, c.realizedprofits, c.unrealizedprofits " +
+                    "FROM users u JOIN client c ON u.username = c.username " +
+                    "WHERE u.role = ? AND u.username = ? AND u.password = ?";
+
+            PreparedStatement pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, "client");
+            pstmt.setString(2, username);
+            pstmt.setString(3, password);
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String username1 = rs.getString("username");
+                String password1 = rs.getString("password");
+                String email1 = rs.getString("email");
+                double accountBalance = rs.getDouble("accountBalance");
+                double realizedProfits = rs.getDouble("realizedprofits");
+                double unrealizedProfits = rs.getDouble("unrealizedprofits");
+
+                Client client = new Client(username1, password1, email1, accountBalance, realizedProfits, unrealizedProfits);
+                return client;
             }
+            rs.close();
+
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        } finally {
+            try {
+                DatabaseConnection.closeConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }//k
         }
+        System.out.println("Login successfully");
         return new Client();
+        //
     }
 
     public ArrayList<Client> getDB(){
