@@ -1,6 +1,7 @@
 import Database.DatabaseConnection;
 import LogInRegistration.LogRegPage;
 import Manager.Manager;
+import GUI.*;
 
 import java.util.Scanner;
 import java.sql.Connection;
@@ -13,9 +14,10 @@ public class App {
         Connection c = null;
         Statement stmt = null;
         c = DatabaseConnection.getConnection();
-
+        new GUI.WelcomePage();
         //c.connecttodb();
-        System.out.println("Press 1 for Manager.Manager or 2 for Client.Client");
+
+        /*System.out.println("Press 1 for Manager.Manager or 2 for Client.Client");
         sc = new Scanner(System.in);
         int loginDecision = sc.nextInt();
         if(loginDecision==1) {
@@ -23,6 +25,6 @@ public class App {
         }
         else if(loginDecision==2) {
             new LogRegPage().run();
-        }
+        }*/
     }
 }
