@@ -1,3 +1,7 @@
+package LogInRegistration;
+
+import LogInRegistration.LogIn;
+
 import java.util.Scanner;
 public class LogRegPage {
     //Instance variables

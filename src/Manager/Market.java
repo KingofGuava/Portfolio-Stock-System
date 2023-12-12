@@ -1,8 +1,12 @@
+package Manager;
+
+import Client.*;
 import java.util.ArrayList;
 
-public class Market {
+public class Market implements MarketWatchList {
     //Attributes
     private static ArrayList<Stock> stockMarket = new ArrayList<Stock>();
+    private ArrayList<Client> observers = new ArrayList<Client>();
 
     static {
         stockMarket.add(new Stock("TSLA", 235.58, 10000, 235.58));
@@ -42,6 +46,23 @@ public class Market {
     //Modify price of a stock
     public void modifyStockPrice(int index, double price) {
         stockMarket.get(index).setPrice(price);
+    }
+
+    @Override
+    public void registerObserver(Client observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Client observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(String stockSymbol, double stockPrice) {
+        for (Client observer : observers) {
+            observer.update(stockSymbol, stockPrice);
+        }
     }
 
 }

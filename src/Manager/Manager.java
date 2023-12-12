@@ -1,3 +1,8 @@
+package Manager;
+
+import Client.Client;
+import LogInRegistration.Account;
+
 import java.util.Scanner;
 
 public class Manager extends Account {
@@ -9,13 +14,13 @@ public class Manager extends Account {
 
     //Functions
     public void Run(){
-        //new LogRegPage().run();
-        //Market market = new Market();
+        //new LogInRegistration.LogRegPage().run();
+        //Manager.Market market = new Manager.Market();
         while(true){
             sc = new Scanner(System.in);
             System.out.println("Please decide your action by pressing a number from 1 to 5 ");
             int action = sc.nextInt();
-            if(action==1) {         //Add Stock
+            if(action==1) {         //Add Manager.Stock
                 market.printMarket();
                 System.out.println("Please input the symbol of the stock you want to add.");
                 String symbol = sc.next();
@@ -26,7 +31,7 @@ public class Manager extends Account {
                 System.out.println("Below is the list of stocks in the market after change: ");
                 market.printMarket();
             }
-            else if(action==2) {    //Remove Stock
+            else if(action==2) {    //Remove Manager.Stock
                 market.printMarket();
                 System.out.println("Please input the index of the stock you want to remove.");
                 int index = sc.nextInt();
@@ -34,7 +39,7 @@ public class Manager extends Account {
                 System.out.println("Below is the list of stocks in the market after change: ");
                 market.printMarket();
             }
-            else if(action==3) {    //Modify Stock Price
+            else if(action==3) {    //Modify Manager.Stock Price
                 market.printMarket();
                 System.out.println("Please input the index of the stock you want to modify.");
                 int index = sc.nextInt();
@@ -43,13 +48,15 @@ public class Manager extends Account {
                 market.modifyStockPrice(index, price);
                 System.out.println("Below is the list of stocks in the market after change: ");
                 market.printMarket();
+                //invokes the notify function in observation pattern in MarketWatchList interface
+                market.notifyObservers(market.getMarket().get(index).getSymbol(), price);
             }
-            else if(action==4) {    //Track Client Profits
+            else if(action==4) {    //Track Client.Client Profits
                 clientDB.print();
             }
-            else if(action==5) {    //Notify Client
+            else if(action==5) {    //Notify Client.Client
                 clientDB.printNameOnly();
-                System.out.println("Please input the index of the Client you want to notify.");
+                System.out.println("Please input the index of the Client.Client you want to notify.");
                 int index = sc.nextInt();
                 System.out.println("Please input the message you want to notify the client.");
                 String msg = sc.next();

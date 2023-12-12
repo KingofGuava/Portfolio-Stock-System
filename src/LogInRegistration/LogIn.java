@@ -1,4 +1,8 @@
-import java.util.Scanner;
+package LogInRegistration;
+
+import Client.*;
+
+import Database.ClientDB;
 
 public class LogIn extends LogRegBase {
 

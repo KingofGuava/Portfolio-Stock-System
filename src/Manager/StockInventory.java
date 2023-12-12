@@ -1,3 +1,7 @@
+package Manager;
+
+import Manager.Stock;
+
 import java.util.ArrayList;
 
 public class StockInventory {
@@ -18,7 +22,7 @@ public class StockInventory {
     public void displayStock(){
         for(int i=0; i<stockList.size(); i++){
             System.out.println("[" + i + "] " + "Symbol: " + stockList.get(i).getSymbol() );
-            System.out.println(" Current Price: " + stockList.get(i).getPrice() + " | Owned Shares: " + stockList.get(i).getShare() + " | Buy In Price: " + stockList.get(i).getBuyInPrice());
+            System.out.println(" Current Price: " + stockList.get(i).getPrice() + " | Owned Shares: " + stockList.get(i).getShare() + " | Client.Buy In Price: " + stockList.get(i).getBuyInPrice());
         }
     }
 }

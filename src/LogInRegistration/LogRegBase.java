@@ -1,3 +1,7 @@
+package LogInRegistration;
+
+import Database.ClientDB;
+
 public abstract class LogRegBase {
     protected String usernameEntry;  //////
     protected String passwordEntry;/////////

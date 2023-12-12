@@ -1,3 +1,5 @@
+package Manager;
+
 public class Stock {
     //Attributes
     private String symbol;

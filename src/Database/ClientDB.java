@@ -1,3 +1,7 @@
+package Database;
+
+import Client.*;
+
 import java.util.ArrayList;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,9 +47,9 @@ public class ClientDB {
         }
         System.out.println("Query done successfully");
 
-        //clientDB.add(new Client("Alex", "pwd1", "a@gmail.com"));
-        //clientDB.add(new Client("Berry", "pwd2", "b@gmail.com"));
-        //clientDB.add(new Client("Karen", "pwd3", "c@gmail.com"));
+        //clientDB.add(new Client.Client("Alex", "pwd1", "a@gmail.com"));
+        //clientDB.add(new Client.Client("Berry", "pwd2", "b@gmail.com"));
+        //clientDB.add(new Client.Client("Karen", "pwd3", "c@gmail.com"));
     }
     //Function
     public void print(){
@@ -157,7 +161,7 @@ public class ClientDB {
         return this.clientDB;
     }
     
-    //Add one new Client to the database
+    //Add one new Client.Client to the database
     public void addNewClient(Client client) {
         clientDB.add(client);
     }

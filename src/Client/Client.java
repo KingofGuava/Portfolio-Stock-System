@@ -1,13 +1,18 @@
+package Client;
+
+import LogInRegistration.Account;
+import Manager.*;
+import Database.DatabaseConnection;
+
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-public class Client extends Account {
+
+public class Client extends Account implements StockObserver {
     //Attributes
     private double balance;
     private double unreaProfit;
@@ -77,12 +82,12 @@ public class Client extends Account {
     //Function
     public void Run(){
         this.fetchclient();
-        //Market market = new Market();
+        //Manager.Market market = new Manager.Market();
         while(true){
             sc = new Scanner(System.in);
             System.out.println("Please decide your action by pressing a number from 1 to 5 ");
             int action = sc.nextInt();
-            if(action==1) {         //Buy
+            if(action==1) {         //Client.Buy
                 market.printMarket();
                 System.out.println("The balance you have now is: " + this.balance);
                 System.out.println("Please input the index of the stock you would like to buy");
@@ -94,7 +99,7 @@ public class Client extends Account {
                 System.out.println("You've bought the stock " + targetStock.getSymbol() + " for a quantity of " + quantity);
                 System.out.println("The remaining balance you have now is: " + this.balance);
             }
-            else if(action==2) {    //Sell
+            else if(action==2) {    //Client.Sell
                 print();
                 System.out.println("Please input the index of the stock you would like to buy");
                 int index = sc.nextInt();
@@ -102,12 +107,12 @@ public class Client extends Account {
                 double quantity = sc.nextDouble();
                 Sell(index, quantity);
             }
-            else if(action==3) {    //Deposit
+            else if(action==3) {    //Client.Deposit
                 System.out.println("Please input the amount of money you would like to deposit");
                 double money = sc.nextDouble();
                 Deposit(money);
             }
-            else if(action==4) {    //Withdraw
+            else if(action==4) {    //Client.Withdraw
                 System.out.println("Please input the amount of money you would like to withdraw");
                 double money = sc.nextDouble();
                 Withdraw(money);
@@ -180,4 +185,11 @@ public class Client extends Account {
         System.out.println("-----------------------");
         System.out.println();
     }
+
+    //implements the stockobserver interface, it will be notified once the stock is updated
+    @Override
+    public void update(String stockSymbol, double stockPrice) {
+        System.out.println(username + " received an update for " + stockSymbol + ": $" + stockPrice);
+    }
+
 }

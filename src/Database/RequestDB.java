@@ -1,3 +1,8 @@
+package Database;
+
+import Database.ClientDB;
+import Client.*;
+
 import java.util.ArrayList;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,9 +12,9 @@ public class RequestDB {
     //Attributes
     private static ArrayList<Client> requestDB = new ArrayList<Client>();
 //    static{
-//        requestDB.add(new Client("Alex", "pwd1", "a@gmail.com"));
-//        requestDB.add(new Client("Berry", "pwd2", "b@gmail.com"));
-//        requestDB.add(new Client("Karen", "pwd3", "c@gmail.com"));
+//        requestDB.add(new Client.Client("Alex", "pwd1", "a@gmail.com"));
+//        requestDB.add(new Client.Client("Berry", "pwd2", "b@gmail.com"));
+//        requestDB.add(new Client.Client("Karen", "pwd3", "c@gmail.com"));
 //    }
 
     //Function

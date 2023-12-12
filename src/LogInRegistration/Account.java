@@ -1,3 +1,9 @@
+package LogInRegistration;
+
+import Database.ClientDB;
+import Database.RequestDB;
+import Manager.*;
+
 import java.util.ArrayList;
 
 public abstract class Account {

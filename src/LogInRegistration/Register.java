@@ -1,3 +1,9 @@
+package LogInRegistration;
+
+import Client.Client;
+import Database.RequestDB;
+import LogInRegistration.LogRegBase;
+
 public class Register extends LogRegBase {
     private String email;
     private RequestDB requestDB;
