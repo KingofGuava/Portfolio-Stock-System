@@ -226,8 +226,8 @@ public class ClientDB {
                 pstmtInsert.setString(1, client.getUserName());
                 pstmtInsert.setString(2, stock.getSymbol());
                 pstmtInsert.setDouble(3, currentPrice);
-                pstmtInsert.setInt(5, sharesToBuy);
-                pstmtInsert.setDouble(4, currentPrice);
+                pstmtInsert.setInt(4, sharesToBuy);
+                pstmtInsert.setDouble(5, currentPrice);
                 pstmtInsert.executeUpdate();
                 pstmtInsert.close();
             }
@@ -397,6 +397,44 @@ public class ClientDB {
 
     public ArrayList<Client> getDB(){
         return this.clientDB;
+    }
+    public float getFunds(Client client) {
+        return getFinancialData(client, "accountBalance");
+    }
+
+    public float getUnrealizedProfits(Client client) {
+        return getFinancialData(client, "unrealizedProfits");
+    }
+
+    public float getRealizedProfits(Client client) {
+        return getFinancialData(client, "realizedProfits");
+    }
+
+    // Utility method to get financial data from the database
+    private float getFinancialData(Client client, String fieldName) {
+        float result = 0f;
+        Connection c = null;
+        try {
+            c = DatabaseConnection.getConnection();
+            String sql = "SELECT " + fieldName + " FROM ClientTable WHERE username = ?";
+            PreparedStatement pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, client.getUserName());
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                result = rs.getFloat(fieldName);
+            }
+            rs.close();
+            pstmt.close();
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("SQLException: " + e.getMessage());
+        } finally {
+            try {
+                if (c != null) c.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
     
     //Add one new Client.Client to the database
