@@ -1,5 +1,7 @@
 package GUI;
 
+import Database.ClientDB;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -87,7 +89,7 @@ public class AdministratorLoginPage extends JFrame {
                 String username = userNameTextField.getText();
                 String password = passwordField.getText();
                 // Compare the userName and Password
-                if(username.equals("admin") && password.equals("admin"))
+                if(ClientDB.managerisRegistered(username,password))
                     //JOptionPane.showMessageDialog(AdministratorLoginPage.this, "Login in!");
                     new GUI.AdminManagementPage();
                 else{
