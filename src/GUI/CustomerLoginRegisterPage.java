@@ -1,5 +1,6 @@
 package GUI;
 
+import Database.ClientDB;
 import LogInRegistration.*;
 
 import javax.swing.*;
@@ -94,7 +95,7 @@ public class CustomerLoginRegisterPage extends JFrame implements LogRegIface{
                 String username = userNameTextField.getText();
                 String password = passwordField.getText();
                 // Compare the userName and Password
-                if(username.equals("customer") && password.equals("123")) {
+                if(ClientDB.clientisRegistered(username,password)) {
                     JOptionPane.showMessageDialog(CustomerLoginRegisterPage.this, "Login in!");
                     runLogIn(username,password);
                 }
