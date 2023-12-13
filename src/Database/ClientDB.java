@@ -64,7 +64,7 @@ public class ClientDB {
         }
     }
     //Check whether there is a registered client account matches the username entry and password entry
-    public static boolean isRegistered(String username, String password) {
+    public static boolean clientisRegistered(String username, String password) {
             Connection c = null;
             try {
                 c = DatabaseConnection.getConnection();
@@ -84,21 +84,6 @@ public class ClientDB {
                     rs.close();
                     return false;
                 }
-//                while (rs.next()) {
-//                    String username1 = rs.getString("username");
-//                    String password1 = rs.getString("password");
-//                    String email1 = rs.getString("email");
-//                    String role1 = rs.getString("role");
-//                    System.out.println("my username is： " + username1);
-//                    System.out.println("my password is： " + password1);
-//                    System.out.println("my email is： " + email1);
-//                    System.out.println("my role is： " + role1);
-//                    if (username1.equalsIgnoreCase(username)
-//                            &&  password1.equalsIgnoreCase(password)) {
-//                        return true;
-//                    }
-//                }
-//                rs.close();
             } catch (Exception e) {
                 System.err.println(e.getClass().getName() + ": " + e.getMessage());
                 System.exit(0);
@@ -110,6 +95,39 @@ public class ClientDB {
                 }
             }
             System.out.println("Login successfully");
+        return false;
+    }
+    public static boolean managerisRegistered(String username, String password) {
+        Connection c = null;
+        try {
+            c = DatabaseConnection.getConnection();
+
+            String sql = "SELECT * FROM Users WHERE role=? AND username=? AND password=?";
+            PreparedStatement pstmt = c.prepareStatement(sql);
+            pstmt.setString(1, "manager");
+            pstmt.setString(2, username);
+            pstmt.setString(3, password);
+
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                rs.close();
+                return true;
+            }
+            else {
+                rs.close();
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            System.exit(0);
+        } finally {
+            try {
+                DatabaseConnection.closeConnection();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Login successfully");
         return false;
     }
 
