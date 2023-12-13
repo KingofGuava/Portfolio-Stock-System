@@ -1,12 +1,10 @@
 package Database;
 
 import Client.*;
+import Manager.Stock;
 
+import java.sql.*;
 import java.util.ArrayList;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 public class ClientDB {
     //Attributes
@@ -173,6 +171,228 @@ public class ClientDB {
         System.out.println("Login successfully");
         return new Client();
         //
+    }
+    public void buystocks(Client client, Stock stock, int sharesToBuy) {
+        Connection c = null;
+        int totalShares=0;
+        double averageBuyInPrice=0;
+        try {
+            c = DatabaseConnection.getConnection();
+            c.setAutoCommit(false); // Start transaction
+
+            // Step 1: Get the current price of the stock from the ClientStock table for 'market'
+            String sqlSelectMarket = "SELECT currentprice FROM ClientStock WHERE username = ? AND symbol = ?";
+            PreparedStatement pstmtSelectMarket = c.prepareStatement(sqlSelectMarket);
+            pstmtSelectMarket.setString(1, "market");
+            pstmtSelectMarket.setString(2, stock.getSymbol());
+            ResultSet rsMarket = pstmtSelectMarket.executeQuery();
+
+            double currentPrice = 0;
+            if (rsMarket.next()) {
+                currentPrice = rsMarket.getDouble("currentprice");
+            }
+            rsMarket.close();
+            pstmtSelectMarket.close();
+
+            // Step 2: Check if the client already has the stock
+            String sqlSelectClient = "SELECT shares, buyinprice FROM ClientStock WHERE username = ? AND symbol = ?";
+            PreparedStatement pstmtSelectClient = c.prepareStatement(sqlSelectClient);
+            pstmtSelectClient.setString(1, client.getUserName());
+            pstmtSelectClient.setString(2, stock.getSymbol());
+            ResultSet rsClient = pstmtSelectClient.executeQuery();
+
+            if (rsClient.next() && rsClient.getInt("shares") > 0) {
+                // Client already has stock, calculate new average buyinprice
+                int existingShares = rsClient.getInt("shares");
+                double existingBuyInPrice = rsClient.getDouble("buyinprice");
+                double totalCost = existingBuyInPrice * existingShares + currentPrice * sharesToBuy;
+                totalShares = existingShares + sharesToBuy;
+                averageBuyInPrice = totalCost / totalShares;
+
+                // Update the existing stock with new buyinprice and shares
+                String sqlUpdate = "UPDATE ClientStock SET shares = ?, buyinprice = ?, currentprice = ? WHERE username = ? AND symbol = ?";
+                PreparedStatement pstmtUpdate = c.prepareStatement(sqlUpdate);
+                pstmtUpdate.setInt(1, totalShares);
+                pstmtUpdate.setDouble(2, averageBuyInPrice);
+                pstmtUpdate.setDouble(3, currentPrice);
+                pstmtUpdate.setString(4, client.getUserName());
+                pstmtUpdate.setString(5, stock.getSymbol());
+                pstmtUpdate.executeUpdate();
+                pstmtUpdate.close();
+            } else {
+                // Client does not have stock, insert new stock for the client
+                String sqlInsert = "INSERT INTO ClientStock (username, symbol, currentprice, shares, buyinprice) VALUES (?, ?, ?, ?, ?)";
+                PreparedStatement pstmtInsert = c.prepareStatement(sqlInsert);
+                pstmtInsert.setString(1, client.getUserName());
+                pstmtInsert.setString(2, stock.getSymbol());
+                pstmtInsert.setDouble(3, currentPrice);
+                pstmtInsert.setInt(5, sharesToBuy);
+                pstmtInsert.setDouble(4, currentPrice);
+                pstmtInsert.executeUpdate();
+                pstmtInsert.close();
+            }
+            rsClient.close();
+            pstmtSelectClient.close();
+
+            // Step 3: Update the client's account balance and unrealized profit in the Client table
+            String sqlUpdateClient = "UPDATE Client SET accountbalance = accountbalance - ?, unrealizedprofits = unrealizedprofits + ? WHERE username = ?";
+            PreparedStatement pstmtUpdateClient = c.prepareStatement(sqlUpdateClient);
+            double cost = currentPrice * sharesToBuy;
+            pstmtUpdateClient.setDouble(1, cost);
+
+            // Assuming you have a method to calculate the new unrealized profit
+            double newUnrealizedProfit = calculateUnrealizedProfit(client, stock, totalShares, averageBuyInPrice, currentPrice);
+            pstmtUpdateClient.setDouble(2, newUnrealizedProfit);
+
+            pstmtUpdateClient.setString(3, client.getUserName());
+            pstmtUpdateClient.executeUpdate();
+            pstmtUpdateClient.close();
+
+            // Commit the transaction
+            c.commit();
+
+        } catch (SQLException e) {
+            System.err.println("SQLException: " + e.getMessage());
+            try {
+                if (c != null) c.rollback(); // Roll back the transaction if an error occurs
+            } catch (SQLException ex) {
+                System.err.println("SQLException on rollback: " + ex.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            try {
+                if (c != null) c.close(); // Close the connection when done
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Method to calculate new unrealized profit - placeholder for actual calculation
+    private double calculateUnrealizedProfit(Client client, Stock stock, int totalShares, double averageBuyInPrice, double marketPrice) {
+        // This is a placeholder for the actual calculation.
+        // You need to implement this based on your specific requirements.
+        return (marketPrice - averageBuyInPrice) * totalShares;
+    }
+    public void sellstocks(Client client, Stock stock, int sharesToSell) {
+        Connection c = null;
+        try {
+            c = DatabaseConnection.getConnection();
+            c.setAutoCommit(false); // Start transaction
+
+            // Step 1: Get the current price of the stock from the ClientStock table for 'market'
+            String sqlSelect = "SELECT currentprice FROM ClientStock WHERE username = ? AND symbol = ?";
+            PreparedStatement pstmtSelect = c.prepareStatement(sqlSelect);
+            pstmtSelect.setString(1, "market");
+            pstmtSelect.setString(2, stock.getSymbol());
+            ResultSet rs = pstmtSelect.executeQuery();
+
+            double currentPrice = 0;
+            if (rs.next()) {
+                currentPrice = rs.getDouble("currentprice");
+            }
+            rs.close();
+            pstmtSelect.close();
+
+            // Step 2: Update the client's shares in the ClientStock table
+            String sqlUpdateShares = "UPDATE ClientStock SET shares = shares - ? WHERE username = ? AND symbol = ?";
+            PreparedStatement pstmtUpdateShares = c.prepareStatement(sqlUpdateShares);
+            pstmtUpdateShares.setInt(1, sharesToSell);
+            pstmtUpdateShares.setString(2, client.getUserName());
+            pstmtUpdateShares.setString(3, stock.getSymbol());
+            pstmtUpdateShares.executeUpdate();
+            pstmtUpdateShares.close();
+
+            // Step 3: Update the client's account balance, unrealizedprofit, and realizedprofit in the Client table
+            String sqlUpdateClient = "UPDATE Client SET accountbalance = accountbalance + ?, unrealizedprofit = unrealizedprofit - ?, realizedprofit = realizedprofit + ? WHERE username = ?";
+            PreparedStatement pstmtUpdateClient = c.prepareStatement(sqlUpdateClient);
+            double transactionAmount = currentPrice * sharesToSell;
+            pstmtUpdateClient.setDouble(1, transactionAmount);
+            pstmtUpdateClient.setDouble(2, transactionAmount);
+            pstmtUpdateClient.setDouble(3, transactionAmount);
+            pstmtUpdateClient.setString(4, client.getUserName());
+            pstmtUpdateClient.executeUpdate();
+            pstmtUpdateClient.close();
+
+            // Commit the transaction
+            c.commit();
+
+        } catch (SQLException e) {
+            System.err.println("SQLException: " + e.getMessage());
+            try {
+                if (c != null) c.rollback(); // Roll back the transaction if an error occurs
+            } catch (SQLException ex) {
+                System.err.println("SQLException on rollback: " + ex.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+        } finally {
+            try {
+                if (c != null) c.close(); // Close the connection when done
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public String[][] display(Client client) {
+        Connection c = null;
+        ArrayList<String[]> marketStocksList = new ArrayList<>();
+        try {
+            c = DatabaseConnection.getConnection();
+
+            // Step 1: Get all stocks for 'market'
+            String sqlMarket = "SELECT symbol, currentprice, shares, buyinprice FROM ClientStock WHERE username = 'market'";
+            Statement stmtMarket = c.createStatement();
+            ResultSet rsMarket = stmtMarket.executeQuery(sqlMarket);
+
+            while (rsMarket.next()) {
+                String symbol = rsMarket.getString("symbol");
+                String currentPrice = rsMarket.getString("currentprice");
+                String shares = rsMarket.getString("shares");
+                String buyinPrice = rsMarket.getString("buyinprice");
+                marketStocksList.add(new String[]{symbol, currentPrice, shares, buyinPrice});
+            }
+            rsMarket.close();
+            stmtMarket.close();
+
+            // Step 2: Get all stocks for the provided client
+            String sqlClient = "SELECT symbol, currentprice, shares, buyinprice FROM ClientStock WHERE username = ?";
+            PreparedStatement pstmtClient = c.prepareStatement(sqlClient);
+            pstmtClient.setString(1, client.getUserName());
+            ResultSet rsClient = pstmtClient.executeQuery();
+
+            // Step 3: Update marketStocksList with the client's stock information if there is a match on symbol
+            while (rsClient.next()) {
+                String symbol = rsClient.getString("symbol");
+                String currentPrice = rsClient.getString("currentprice");
+                String shares = rsClient.getString("shares");
+                String buyinPrice = rsClient.getString("buyinprice");
+
+                for (int i = 0; i < marketStocksList.size(); i++) {
+                    String[] marketStock = marketStocksList.get(i);
+                    if (marketStock[0].equals(symbol)) {
+                        marketStocksList.set(i, new String[]{symbol, currentPrice, shares, buyinPrice});
+                        break;
+                    }
+                }
+            }
+            rsClient.close();
+            pstmtClient.close();
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("SQLException: " + e.getMessage());
+        } finally {
+            try {
+                if (c != null) c.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Convert the list to a 2D array before returning
+        String[][] marketStocksArray = new String[marketStocksList.size()][];
+        return marketStocksList.toArray(marketStocksArray);
     }
 
     public ArrayList<Client> getDB(){
